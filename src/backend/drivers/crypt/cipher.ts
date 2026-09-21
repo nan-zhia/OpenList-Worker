@@ -28,7 +28,7 @@ export class CryptCipher {
     const dk = (await scrypt({
       password,
       salt: salt || "",
-      costFactor: 16384, // N = 2^14，必须是 2 的幂
+      costFactor: 4096, // N = 2^14，必须是 2 的幂
       blockSize: 8, // r
       parallelism: 1, // p
       hashLength: 64, // dkLen
