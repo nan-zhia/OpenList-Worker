@@ -36,6 +36,20 @@
   },
 
   // ===========================================================================
+  // WebAssembly 预编译规则
+  // Cloudflare Workers 禁止运行时调用 WebAssembly.compile / instantiate，
+  // 必须通过以下规则让 Wrangler 在部署时预编译所有 .wasm 文件。
+  // 若项目中未使用 Wasm，可保留此规则，不影响正常功能。
+  // ===========================================================================
+  "rules": [
+    {
+      "type": "CompiledWasm",
+      "globs": ["**/*.wasm"],
+      "fallthrough": true
+    }
+  ],
+
+  // ===========================================================================
   // 普通环境变量（非敏感）
   // 注意：vars 会在每次 wrangler deploy 时被本文件覆盖（Secrets 不会）。
   // ===========================================================================
@@ -78,6 +92,8 @@
     // ── 安全鉴权（推荐以 Secret 类型配置，见 .dev.vars.example）──────────
     //
     // JWT 签名密钥（>=16 字符，兼作可选的字段加密密钥与定时任务鉴权）
+    // ⚠️ 建议通过 `wrangler secret put JWT_SECRET` 或 Dashboard Secret 设置，
+    //    不要明文写在 vars 中。若在 Dashboard 存在同名 Secret，会覆盖此处的值。
     "JWT_SECRET": "O73y2rYlhdgcCeqmu4jAFoJUG7P6yFt6tg95BLVZYUpUTNaKFrxfqvcMKJXkHPzr",
     //
     // 跳过安装向导，自动以该密码初始化 admin
@@ -144,7 +160,7 @@
   //   若想改用账户里已有的 KV，把该命名空间的 id 填进来即可。
   //
   "kv_namespaces": [
-    { "binding": "KV"}
+    { "binding": "KV" }
   ],
   //
   // ▶ 方案 B：D1（关系型，可与 Go 后端共享库；DB_FORMAT 建议改为 "sql"）
